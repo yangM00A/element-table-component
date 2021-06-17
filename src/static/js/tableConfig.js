@@ -18,25 +18,27 @@ export const queryBtnArray = [{
 
 // 所有操作按钮集合 (operateBtnArray)
 export const tableBtnArray = [{
-    label: "view",
+    label: "info",
     value: "详情",
-    method: "viewInfo",
-    icon: 'el-icon-info'
+    btnType: 'info',
+    icon: 'el-icon-search'
   },
   {
     label: "edit",
     value: "编辑",
+    btnType: 'primary',
     icon: 'el-icon-edit'
   },
   {
     label: "disable",
     value: "禁用",
-    btnType: 'danger',
+    btnType: 'warning',
     icon: 'el-icon-warning'
   },
   {
     label: "delete",
     value: "删除",
+    btnType: 'danger',
     icon: 'el-icon-delete'
   },
 ]
