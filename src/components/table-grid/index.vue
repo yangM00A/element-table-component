@@ -25,8 +25,8 @@
 
       <el-table-column fixed="right" label="操作" :width="tableBtnColWidth" align="center" v-if="tableBtnList.length > 0">
         <template slot-scope="scope">
-          <el-button v-for="(opera ,index) in tableBtnList" :type="btnType" :key="index" @click="handleClick(opera,scope.row)" :size="size">
-            <i :class="opera.icon"></i>{{opera.value}}
+          <el-button v-for="(item ,index) in tableBtnList" :type="item.btnType" :key="index" @click="handleClick(item,scope.row)" :size="size">
+            <i :class="item.icon">{{item.value}}</i>
           </el-button>
         </template>
       </el-table-column>
@@ -58,6 +58,7 @@ export default {
     // table表格高度
     height: {
       type: String,
+      default: () => "80vh",
     },
     // 操作列的宽度
     tableBtnColWidth: {
@@ -71,7 +72,7 @@ export default {
     },
 
     /**
-     * {
+     * tableColumn:{
      * columnName:string
      * title：string,
      * columnType:text|switch|image,
@@ -106,6 +107,17 @@ export default {
   computed: {
     tableBtnList() {
       return getArrByKey(tableBtnArray, this.tableBtn);
+    },
+  },
+
+  watch: {
+    tableData: {
+      handler(value) {
+        this.$nextTick(() => {
+          // 重新渲染列表，解决列表错位
+          this.$refs.tableList.doLayout();
+        });
+      },
     },
   },
 
