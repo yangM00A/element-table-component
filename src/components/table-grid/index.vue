@@ -33,8 +33,10 @@
 
     </el-table>
 
-    <!-- <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageObj.pageIndex" :page-sizes="pageObj.pageList" layout="total, sizes, prev, pager, next, jumper" :total="pageObj.total">
-    </el-pagination> -->
+    <div class="pageClass">
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageObj.pageIndex" :page-sizes="pageObj.pageList" layout="total, sizes, prev, pager, next, jumper" :total="pageObj.total">
+      </el-pagination>
+    </div>
   </div>
 </template>
 
@@ -96,7 +98,7 @@ export default {
     return {
       size: elementConfig.size,
       pageObj: {
-        pageList: [],
+        pageList: [10,20,50,100],
         total: 0,
         pageSize: 10,
         pageIndex: 1,
@@ -105,6 +107,7 @@ export default {
   },
 
   computed: {
+    // 处理列表操作按钮
     tableBtnList() {
       return getArrByKey(tableBtnArray, this.tableBtn);
     },
@@ -151,4 +154,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.pageClass {
+  margin-top: 10px;
+  text-align: center;
+  height: 50px;
+}
 </style>

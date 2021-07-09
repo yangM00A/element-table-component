@@ -6,9 +6,7 @@ import http from "@/http";
  * @param {Stirng} tableId 
  * @returns 
  */
-export function getTableConfig(tableId) {
-  return http.get(`/query/${tableId}`)
-}
+export const getTabelConfig = (tableId) => http.get(`/query/${tableId}`)
 
 /**
  * table 分页查询
@@ -16,4 +14,4 @@ export function getTableConfig(tableId) {
  * @param {Object} param 
  * @returns 
  */
-export const queryPage = (tableId, param) => http.post(`/query/${tableId}`, param)
+export const getTableList = (tableId, param) => http.post(`/query/${tableId}`, param)

@@ -8,7 +8,9 @@ import 'element-ui/lib/theme-chalk/index.css';
 
 // --------公共组件--------- start
 import tableGrid from "@/components/table-grid";
+import formGrid from "@/components/form-grid";
 Vue.component("table-grid", tableGrid)
+Vue.component("form-grid", formGrid)
 // --------公共组件--------- end
 
 Vue.config.productionTip = false
