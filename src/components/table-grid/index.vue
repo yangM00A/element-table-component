@@ -6,6 +6,8 @@
       <el-table-column v-if="selection" prop="id" label="选择" width="50" align="center" type="selection">
       </el-table-column>
 
+      <el-table-column v-if="index" type="index" width="50" align="center"> </el-table-column>
+
       <el-table-column v-for="(item ,index) in tableColumn" :key="index" :prop="item.columnName" :label="item.title" :width="item.width" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           <span v-if="item.columnType=='image'" @click="clickTableCli(item.columnName,scope.row)" style="margin-left: 10px">
@@ -25,7 +27,7 @@
 
       <el-table-column fixed="right" label="操作" :width="tableBtnColWidth" align="center" v-if="tableBtnList.length > 0">
         <template slot-scope="scope">
-          <el-button v-for="(item ,index) in tableBtnList" :type="item.btnType" :key="index" @click="handleClick(item,scope.row)" :size="size">
+          <el-button v-for="(item ,index) in tableBtnList" :type="item.btnType" :key="index" @click="handleClick(item,scope.row)" :size="buttonSize">
             <i :class="item.icon">{{item.value}}</i>
           </el-button>
         </template>
@@ -34,7 +36,7 @@
     </el-table>
 
     <div class="pageClass">
-      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageObj.pageIndex" :page-sizes="pageObj.pageList" layout="total, sizes, prev, pager, next, jumper" :total="pageObj.total">
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageObj.pageIndex" :page-sizes="pageObj.pageSizes" layout="total, sizes, prev, pager, next, jumper" :total="pageObj.total">
       </el-pagination>
     </div>
   </div>
@@ -47,6 +49,11 @@ export default {
   props: {
     //是否显示table 选择框
     selection: {
+      type: Boolean,
+      default: () => false,
+    },
+    // 序号
+    index: {
       type: Boolean,
       default: () => false,
     },
@@ -92,17 +99,18 @@ export default {
       type: Array,
       default: () => [],
     },
+
+    // 分页对象
+    pageObj: {
+      type: Object,
+      default: () => {},
+    },
   },
 
   data() {
     return {
       size: elementConfig.size,
-      pageObj: {
-        pageList: [10,20,50,100],
-        total: 0,
-        pageSize: 10,
-        pageIndex: 1,
-      },
+      buttonSize: elementConfig.buttonSize,
     };
   },
 
@@ -115,9 +123,9 @@ export default {
 
   watch: {
     tableData: {
+      // 重新渲染列表，解决列表错位
       handler(value) {
         this.$nextTick(() => {
-          // 重新渲染列表，解决列表错位
           this.$refs.tableList.doLayout();
         });
       },
@@ -138,16 +146,20 @@ export default {
       findMethod(this, opera.method)(item);
     },
 
-    handleSizeChange(val) {
-      this.pageObj.pageSize = val;
-      this.queryMethod();
-      console.log(`每页 ${val} 条`);
+    // 改变每页条数
+    handleSizeChange(pageSize) {
+      let pageObj = JSON.parse(JSON.stringify(this.pageObj));
+      pageObj.pageSize = pageSize;
+      findMethod(this, "queryTabelList")(pageObj);
+      console.log(`每页 ${pageSize} 条`);
     },
 
-    handleCurrentChange(val) {
-      this.pageObj.pageIndex = val;
-      this.queryMethod();
-      console.log(`当前页: ${val}`);
+    // 下一页|上一页|跳页
+    handleCurrentChange(pageIndex) {
+      let pageObj = JSON.parse(JSON.stringify(this.pageObj));
+      pageObj.pageIndex = pageIndex;
+      findMethod(this, "queryTabelList")(pageObj);
+      console.log(`当前页: ${pageIndex}`);
     },
   },
 };

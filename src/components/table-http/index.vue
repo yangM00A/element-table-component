@@ -1,5 +1,5 @@
 <template>
-  <table-grid ref="tablegridRef" :tableData="tableData" :tableColumn="tableColumn" :tableBtn="tableBtn" :loading="loading" tableBtnColWidth='300'></table-grid>
+  <table-grid ref="tablegridRef" :tableData="tableData" :tableColumn="tableColumn" :tableBtn="tableBtn" :pageObj="pageObj" :loading="loading" :index="index" tableBtnColWidth='300'></table-grid>
 </template>
 
 <script>
@@ -7,9 +7,23 @@ import { getTabelConfig, getTableList } from "@/api/table-list";
 export default {
   components: {},
   props: {
+    //是否显示table 选择框
+    selection: {
+      type: Boolean,
+      default: () => false,
+    },
+    // 序号
+    index: {
+      type: Boolean,
+      default: () => false,
+    },
     tableId: {
       type: String,
       default: () => "",
+    },
+    tableBtn: {
+      type: Array,
+      default: () => [],
     },
   },
 
@@ -55,10 +69,8 @@ export default {
         },
       ],
 
-      tableBtn: ["info", "edit", "delete"],
-
       pageObj: {
-        pageList: [],
+        pageSizes: [10, 20, 50, 100],
         total: 0,
         pageSize: 10,
         pageIndex: 1,
@@ -67,11 +79,12 @@ export default {
   },
 
   created() {
-    this.getTabelData();
+    this.initTabelData();
   },
 
   methods: {
-    getTabelData() {
+    //  初始化table
+    initTabelData() {
       let param = {
         pageIndex: 1,
         pageSize: 10,
@@ -86,13 +99,14 @@ export default {
       responeAll
         .then((res) => {
           console.log(res);
-          let tabeleCfgData = res[0];
-          let tabeleData = res[1];
+          let tableCfgData = res[0];
+          let tableData = res[1];
           // 处理tableColumn
-          this.tableColumn = this.handleTableColumn(tabeleCfgData);
+          this.tableColumn = this.handleTableColumn(tableCfgData);
           // 处理tableData
-          this.tableData = tabeleData.data.data;
-        //   this.$refs.tablegridRef.doLayout();
+          this.tableData = tableData.data.data;
+          // 处理分页属性
+          this.handlePage(tableData.data);
         })
         .catch((err) => {
           console.log("请求失败=>", err);
@@ -111,6 +125,34 @@ export default {
         }
       });
       return tableColumn;
+    },
+
+    // 处理分页
+    handlePage(page) {
+      this.pageObj.total = page.total;
+      this.pageObj.pageIndex = page.pageIndex;
+      this.pageObj.pageSize = page.pageSize;
+
+      console.log(this.pageObj);
+    },
+
+    // 查询列表
+    queryTabelList(page) {
+      let param = {
+        pageIndex: page.pageIndex,
+        pageSize: page.pageSize,
+        queryFieldList: [],
+      };
+      getTableList(this.tableId, param)
+        .then((res) => {
+          this.tableData = res.data.data;
+          this.handlePage({
+            pageIndex: res.data.pageIndex,
+            pageSize: res.data.pageSize,
+            total: res.data.total,
+          });
+        })
+        .catch((err) => {});
     },
   },
 };
