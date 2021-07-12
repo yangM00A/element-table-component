@@ -1,11 +1,15 @@
 <template>
-  <table-grid ref="tablegridRef" :tableData="tableData" :tableColumn="tableColumn" :tableBtn="tableBtn" :pageObj="pageObj" :loading="loading" :index="index" tableBtnColWidth='300'></table-grid>
+  <div>
+    <table-search :formItme="formItme" @queryTable="queryTable"></table-search>
+    <table-grid :tableData="tableData" :tableColumn="tableColumn" :tableBtn="tableBtn" :pageObj="pageObj" :loading="loading" :index="index" tableBtnColWidth='300'></table-grid>
+  </div>
 </template>
 
 <script>
 import { getTabelConfig, getTableList } from "@/api/table-list";
+import tableSearch from "@/components/table-search";
 export default {
-  components: {},
+  components: { tableSearch },
   props: {
     //是否显示table 选择框
     selection: {
@@ -25,56 +29,43 @@ export default {
       type: Array,
       default: () => [],
     },
+
   },
 
   data() {
     return {
-      loading: false,
-
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄",
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-      ],
-
-      tableColumn: [
-        {
-          columnName: "name",
-          title: "名称",
-        },
-        {
-          columnName: "date",
-          title: "时间",
-        },
-        {
-          columnName: "address",
-          title: "地址",
-        },
-      ],
-
+      // table参数---start
+      loading: true,
+      tableData: [],
+      tableColumn: [],
       pageObj: {
         pageSizes: [10, 20, 50, 100],
         total: 0,
         pageSize: 10,
         pageIndex: 1,
       },
+      // table参数---end
+      // query 参数--start
+      formItme: [
+        {
+          label: "厕位编号",
+          fieldType: "input",
+          model: "status",
+        },
+        {
+          label: "通知类型",
+          fieldType: "select",
+          options: [
+            { label: "告警通知", value: "告警通知" },
+            { label: "系统通知", value: "系统通知" },
+          ],
+          required: true,
+          model: "notify_template",
+        },
+      ],
+      // 查询条件
+      queryform: {},
+      // query 参数--end
     };
   },
 
@@ -85,6 +76,7 @@ export default {
   methods: {
     //  初始化table
     initTabelData() {
+      this.loading = true;
       let param = {
         pageIndex: 1,
         pageSize: 10,
@@ -98,7 +90,6 @@ export default {
 
       responeAll
         .then((res) => {
-          console.log(res);
           let tableCfgData = res[0];
           let tableData = res[1];
           // 处理tableColumn
@@ -107,9 +98,11 @@ export default {
           this.tableData = tableData.data.data;
           // 处理分页属性
           this.handlePage(tableData.data);
+          this.loading = false;
         })
         .catch((err) => {
           console.log("请求失败=>", err);
+          this.loading = false;
         });
     },
 
@@ -127,21 +120,13 @@ export default {
       return tableColumn;
     },
 
-    // 处理分页
-    handlePage(page) {
-      this.pageObj.total = page.total;
-      this.pageObj.pageIndex = page.pageIndex;
-      this.pageObj.pageSize = page.pageSize;
-
-      console.log(this.pageObj);
-    },
-
     // 查询列表
     queryTabelList(page) {
+      this.loading = true;
       let param = {
         pageIndex: page.pageIndex,
         pageSize: page.pageSize,
-        queryFieldList: [],
+        queryFieldList: this.handleQueryParam(),
       };
       getTableList(this.tableId, param)
         .then((res) => {
@@ -151,8 +136,35 @@ export default {
             pageSize: res.data.pageSize,
             total: res.data.total,
           });
+          this.loading = false;
         })
-        .catch((err) => {});
+        .catch((err) => {
+          this.loading = false;
+        });
+    },
+
+    queryTable(fomrData, query) {
+      this.queryform = fomrData;
+      if (query) {
+        this.queryTabelList(this.pageObj);
+      }
+    },
+
+    // 处理查询条件
+    handleQueryParam() {
+      let queryFieldList = [];
+      for (const key in this.queryform) {
+        queryFieldList.push({ field: key, value1: this.queryform[key] });
+      }
+
+      return queryFieldList;
+    },
+
+    // 处理分页
+    handlePage(page) {
+      this.pageObj.total = page.total;
+      this.pageObj.pageIndex = page.pageIndex;
+      this.pageObj.pageSize = page.pageSize;
     },
   },
 };

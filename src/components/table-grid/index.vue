@@ -35,7 +35,7 @@
 
     </el-table>
 
-    <div class="pageClass">
+    <div class="pageClass" v-if="pageObj">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageObj.pageIndex" :page-sizes="pageObj.pageSizes" layout="total, sizes, prev, pager, next, jumper" :total="pageObj.total">
       </el-pagination>
     </div>

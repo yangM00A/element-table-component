@@ -1,5 +1,5 @@
 <template>
-  <tableHttp :tableId="tableId"></tableHttp>
+  <tableHttp :tableId="tableId" :tableBtn="tableBtn" :index="index"></tableHttp>
 </template>
 
 <script>
@@ -10,7 +10,9 @@ export default {
   },
   data() {
     return {
-      tableId: "messageRemind",
+      index: true,
+      tableId: "toiletStatus",
+      tableBtn: ["info", "edit", "delete"],
     };
   },
 };
