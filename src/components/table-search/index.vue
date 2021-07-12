@@ -20,14 +20,16 @@
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary" @click="queryTable(true)">查询</el-button>
+      <el-button @click="queryTable(true)">查询</el-button>
       <el-button @click="resetForm('queryform')">重置</el-button>
+      <el-button type="primary" @click="add">新增</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script>
 import { elementConfig } from "@/static/js/tableConfig";
+import { getArrByKey, findMethod } from "@/static/js/utils";
 export default {
   props: {
     // 表单项是否可换行
@@ -60,11 +62,15 @@ export default {
 
   methods: {
     queryTable(query) {
-      this.$emit("queryTable", this.queryform,query);
+      this.$emit("queryTable", this.queryform, query);
     },
 
     resetForm(queryform) {
       this.queryform = {};
+    },
+
+    add() {
+      findMethod(this, "addHandle")();
     },
   },
 };
