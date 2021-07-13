@@ -53,6 +53,13 @@ export default {
           model: "status",
         },
         {
+          label: "时间范围",
+          required: true,
+          model: "timeFrame",
+          fieldType: "daterange",
+          style: "width:220px",
+        },
+        {
           label: "通知类型",
           fieldType: "select",
           options: [
